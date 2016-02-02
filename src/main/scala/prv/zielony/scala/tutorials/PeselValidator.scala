@@ -28,20 +28,5 @@ object PeselValidator {
     *   Otherwise, it isn't.
     */
 
-  def validate(pesel:Long):Boolean = {
-
-    if(pesel >= (Math.pow(10, 10)) && pesel <= (Math.pow(10,11)) ) {
-      val factors = List(1, 3, 1, 9, 7, 3, 1, 9, 7, 3, 1);
-
-      var sum:Long = 0;
-      for( i <- (0 until factors.size)) {
-        sum += factors(i)*(Math.floorDiv(pesel, Math.pow(10, i).asInstanceOf[Long])%10)
-      }
-
-      return (sum%10 == 0)
-    }
-    else {
-      return false;
-    }
-  }
+  def validate(pesel:Long):Boolean = ???
 }
