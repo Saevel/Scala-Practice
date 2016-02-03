@@ -14,16 +14,17 @@ object PeselValidator {
     *   We multiply multiply digits respectively:
     *   - first by 1
     *   - second by 3
-    *   - third by 1
+    *   - third by 7
     *   - fourth by 9
-    *   - fifth by 7
+    *   - fifth by 1
     *   - sixth by 3
-    *   - seventh by 1
+    *   - seventh by 7
     *   - eight by 9
-    *   - ninth by 7
+    *   - ninth by 1
     *   - tenth by 3
     *   - eleventh by 1
-    *   where the digits are numerated from the highest to the lowest.
+    *   where the first digit is the one on the left-hand side as the number is written, i.e. for
+    *   1234 the first digit is 1 and the fourth is 4.
     *   Next, we sum all the results. If the final result is divisible by 10, the PESEL number is correct.
     *   Otherwise, it isn't.
     */
