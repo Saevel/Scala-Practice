@@ -31,18 +31,24 @@ object PeselValidator {
 
   def validate(pesel:Long):Boolean = {
 
-    if(pesel >= (Math.pow(10, 10)) && pesel <= (Math.pow(10,11)) ) {
-      val factors = List(1, 3, 1, 9, 7, 3, 1, 9, 7, 3, 1);
+    val factors =  List(1, 3, 7, 9, 1, 3, 7, 9, 1, 3, 1)
 
-      var sum:Long = 0;
-      for( i <- (0 until factors.size)) {
-        sum += factors(i)*(Math.floorDiv(pesel, Math.pow(10, i).asInstanceOf[Long])%10)
-      }
+    var sum: Long = 0;
 
-      return (sum%10 == 0)
+    for(i <- 0 until factors.size){
+      sum += digit(pesel, 11 - i) * factors(i)
     }
-    else {
-      return false;
-    }
+
+    (sum % 10 == 0)
   }
+
+  def digit(i: Long, n: Int): Int = if( i > (10 ^ (n-1)))
+    (( i / Math.pow(10, (n - 1))).toLong % 10).toInt
+  else
+    0
+
+  def digit(i: Int, n: Int): Int = if( i > (10 ^ (n-1)))
+    (( i / Math.pow(10, (n - 1))).toLong % 10).toInt
+  else
+    0
 }

@@ -12,36 +12,17 @@ import org.scalatest.prop.{Checkers, PropertyChecks}
 @RunWith(classOf[JUnitRunner])
 class PeselValidatorTest extends FunSuite with PropertyChecks with Checkers {
 
-  val digitGenerator:Gen[Int] = Gen.oneOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+  val digitGenerator:Gen[Int] = Gen.choose(1, 9)
 
-  val yearGenerator:Gen[(Int, Int)] = (for{
-    digit1 <- Gen.oneOf( 1, 2, 3, 4, 5, 6, 7, 8, 9)
-    digit2 <- digitGenerator
-  } yield((digit1, digit2)))
+  val yearGenerator:Gen[(Int, Int)] = Gen.choose(0, 99).map(i => (digit(i, 1), digit(i, 2)))
 
-  val monthGenerator:Gen[(Int, Int)] = Gen.oneOf((0, 1),(0, 2),(0, 3),(0 ,4),(0, 5), (0, 6), (0, 7),
-    (0,8), (0,9), (1,0), (1,1), (1,2))
+  val monthGenerator:Gen[(Int, Int)] = Gen.choose(1, 12).map(i => (digit(i, 1), digit(i, 2)))
 
-  val dayGenerator:Gen[(Int, Int)] = (for {
+  val dayGenerator:Gen[(Int, Int)] = Gen.choose(1, 28).map(i => (digit(i, 1), digit(i, 2)))
 
-    digit1 <- Gen.choose(0, 3)
-    digit2 <- digitGenerator
+  val tenFactors = List(1, 3, 7, 9, 1, 3, 7, 9, 1, 3)
 
-  } yield ((digit1, digit2))).suchThat({input =>
-    if(input._1 == 3) {
-      input._2 == 0
-    }
-    else if(input._1 == 0) {
-      input._2 != 0
-    }
-    else {
-      true
-    }
-  })
-
-  val factors = List(1, 3, 1, 9, 7, 3, 1, 9, 7, 3, 1);
-
-  val correctPeselListGenerator:Gen[List[Int]] = (for{
+  val peselBaseGenerator: Gen[List[Int]] = for {
       year <- yearGenerator
       month <- monthGenerator
       day <- dayGenerator
@@ -49,66 +30,50 @@ class PeselValidatorTest extends FunSuite with PropertyChecks with Checkers {
       digit8 <- digitGenerator
       digit9 <- digitGenerator
       digit10 <- digitGenerator
-      digit11 <- digitGenerator
   } yield(List(year._1, year._2, month._1, month._2, day._1, day._2,
-      digit7, digit8, digit9, digit10, digit11))).suchThat(list => {
+      digit7, digit8, digit9, digit10))
 
-    val result = list.zipWithIndex.map(tuple => {
-      tuple._1 * factors(factors.size - 1 -tuple._2)
-    }).fold(0) { (element1, element2) =>
-      element1 + element2
-    }
+  val correctPeselGenerator: Gen[List[Int]] = peselBaseGenerator.map(peselBase =>
+    peselBase ++ List((10 - digit(linearCombination(peselBase, tenFactors), 1)) % 10)
+  )
 
-    ((result % 10) == 0)
-  })
-
-  val correctPeselGenerator:Gen[Long] = (
-      for {
-        list <- correctPeselListGenerator
-      } yield(list.zipWithIndex.map { tuple =>
-            tuple._1*Math.pow(10, (list.size - 1 - tuple._2)).asInstanceOf[Long]
-      }.fold(0L) { (element1, element2) =>
-        element1 + element2
-      })
-    )
-
-  val incorrectPeselGenerator = Gen.choose((Math.pow(10,10)+1).asInstanceOf[Long], (Math.pow(10, 11)-1).asInstanceOf[Long])
-    .suchThat( input => {
-    val factors = List(1, 3, 1, 9, 7, 3, 1, 9, 7, 3, 1);
-    var sum:Long = 0;
-    for( i <- (0 until factors.size)) {
-      sum += factors(i)*(Math.floorDiv(input, Math.pow(10, i).asInstanceOf[Long])%10)
-    }
-
-    (sum%10 != 0)
-
-  })
+  val incorrectPeselGenerator: Gen[List[Int]] = peselBaseGenerator.map(peselBase =>
+    peselBase ++ List(9 - digit(linearCombination(peselBase, tenFactors), 1))
+  )
 
   val tooShortPeselGenerator = Gen.choose(0L, Math.pow(10,10).asInstanceOf[Long])
 
   val tooLongPeselGenerator = Gen.choose(Math.pow(10, 11).asInstanceOf[Long], Math.pow(10, 12).asInstanceOf[Long])
 
   test("Should accept correct PESEL") {
-    check(Prop.forAll(correctPeselGenerator) { input =>
-      PeselValidator.validate(input)
+    check(Prop.forAllNoShrink(correctPeselGenerator) { input =>
+      PeselValidator.validate(input.asLong)
     })
   }
 
   test("Should not accept incorrect PESEL") {
-    check(Prop.forAll(incorrectPeselGenerator) { input =>
-      !PeselValidator.validate(input)
+    check(Prop.forAllNoShrink(incorrectPeselGenerator) { input =>
+      !PeselValidator.validate(input.asLong)
     })
   }
 
-  test("Should not accept too short PESEL") {
-    check(Prop.forAll(tooShortPeselGenerator) { input =>
-      !PeselValidator.validate(input)
-    })
+  def linearCombination(a: List[Int], b: List[Int]): Int = a.zip(b).foldLeft(0)((accumulator, tuple) => tuple match {
+    case (x, y) => accumulator + x * y
+  })
+
+  implicit class LongFromIntList(digits: List[Int]){
+    def asLong: Long = digits.zipWithIndex.map{ case (digit, i) =>
+      digit * Math.pow(10, (digits.length - i - 1)).toLong
+    }.foldLeft(0L)((accumulator, x) => accumulator + x)
   }
 
-  test("Should not accept too long PESEL") {
-    check(Prop.forAll(tooLongPeselGenerator) { input =>
-      !PeselValidator.validate(input)
-    })
-  }
+  def digit(i: Long, n: Int): Int = if( i > (10 ^ (n-1)))
+    (( i / Math.pow(10, (n - 1))).toLong % 10).toInt
+  else
+    0
+
+  def digit(i: Int, n: Int): Int = if( i > (10 ^ (n-1)))
+    (( i / Math.pow(10, (n - 1))).toLong % 10).toInt
+  else
+    0
 }

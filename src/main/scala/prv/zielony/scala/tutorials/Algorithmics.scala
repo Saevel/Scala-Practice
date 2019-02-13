@@ -25,7 +25,7 @@ object Algorithmics {
     }
   }
 
-  /*
+  /**
    * The goal is to implement a function calculating Fibonacci numbers, defined as:
    *  - for negative numbers: undefined (None)
    *  - for zero: 1
