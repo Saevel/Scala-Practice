@@ -47,13 +47,13 @@ class PeselValidatorTest extends FunSuite with PropertyChecks with Checkers {
 
   test("Should accept correct PESEL") {
     check(Prop.forAllNoShrink(correctPeselGenerator) { input =>
-      PeselValidator.validate(input.asLong)
+      PeselValidator.validate(input)
     })
   }
 
   test("Should not accept incorrect PESEL") {
     check(Prop.forAllNoShrink(incorrectPeselGenerator) { input =>
-      !PeselValidator.validate(input.asLong)
+      !PeselValidator.validate(input)
     })
   }
 
