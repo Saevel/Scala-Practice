@@ -29,5 +29,5 @@ object PeselValidator {
     *   Otherwise, it isn't.
     */
 
-  def validate(pesel:Long):Boolean = ???
+  def validate(pesel:List[Int]):Boolean = ???
 }
