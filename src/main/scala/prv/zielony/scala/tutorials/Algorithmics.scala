@@ -28,18 +28,18 @@ object Algorithmics {
   /**
    * The goal is to implement a function calculating Fibonacci numbers, defined as:
    *  - for negative numbers: undefined (None)
-   *  - for zero: 1
-   *  - for one: 2
+   *  - for zero: 0
+   *  - for one: 1
    *  - for positive numbers: f(n) = f(n-1) + f(n-2)
    */
 
   def fibonacci(n:Int):Option[Int] = {
 
     if(n == 0) {
-      return Some(1);
+      return Some(0);
     }
     else if(n == 1) {
-      return Some(2);
+      return Some(1);
     }
     else if(n > 1) {
       return Some(fibonacci(n-1).get + fibonacci(n-2).get)

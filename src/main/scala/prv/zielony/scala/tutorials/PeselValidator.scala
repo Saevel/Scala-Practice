@@ -29,18 +29,58 @@ object PeselValidator {
    *   Otherwise, it isn't.
    */
 
-  package prv.zielony.scala.tutorials
+  def validate(pesel:List[Int]):Boolean={
 
-  object PeselValidator{
-    def validate(pesel:List[Int]):Boolean={
-      if (pesel.length==11){
-        var multipliers:List[Int] = List(1,3,7,9,1,3,7,9,1,3,1)
-        if ((pesel,multipliers).zipped.map(_*_).sum % 10 == 0) {
-          true
-        } else {
-          false
+    if (pesel.length == 11){
+
+      var controlSum = 0
+      for (i <- 0 to pesel.length-1) {
+        i match {
+          case 0 => {
+            controlSum = controlSum + pesel(i) * 1
+          }
+          case 1 => {
+            controlSum = controlSum + pesel(i)  * 3
+          }
+          case 2 => {
+            controlSum = controlSum + pesel(i)  * 7
+          }
+          case 3 => {
+            controlSum = controlSum + pesel(i)  * 9
+          }
+          case 4 => {
+            controlSum = controlSum + pesel(i) * 1
+          }
+          case 5 => {
+            controlSum = controlSum + pesel(i)  * 3
+          }
+          case 6 => {
+            controlSum = controlSum + pesel(i)  * 7
+          }
+          case 7 => {
+            controlSum = controlSum + pesel(i) * 9
+          }
+          case 8 => {
+            controlSum = controlSum + pesel(i)  * 1
+          }
+          case 9 => {
+            controlSum = controlSum + pesel(i)  * 3
+          }
+          case 10 => {
+            controlSum = controlSum + pesel(i)  * 1
+          }
+
         }
-      }else{ false}
-    }
-  }
+
+      }
+
+      if (controlSum % 10 == 0) {
+        println ("Prawidlowy numer PESEL")
+        return true
+      } else {
+        println ("Nieprawidlowy numer PESEL")
+        return false
+      }
+    }else{return false}}
 }
+
