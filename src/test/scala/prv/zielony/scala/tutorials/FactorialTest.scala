@@ -40,11 +40,11 @@ class FactorialTest extends FunSuite with PropertyChecks with Checkers{
   }
 
   test("Recursive") {
-   check(Prop.forAll(positiveIntGenerator) { input =>
-     val result = Algorithmics.factorial(input)
+    check(Prop.forAll(positiveIntGenerator) { input =>
+      val result = Algorithmics.factorial(input)
 
-     result.isDefined && (result.get == input*Algorithmics.factorial(input-1).get);
-   })
+      result.isDefined && (result.get == input*Algorithmics.factorial(input-1).get);
+    })
   }
 
 }
