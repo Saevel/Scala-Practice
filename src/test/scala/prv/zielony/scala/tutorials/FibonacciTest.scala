@@ -38,7 +38,7 @@ class FibonacciTest extends FunSuite with PropertyChecks with Checkers {
     check(Prop.forAll(zeroGenerator) { input =>
       val result = Algorithmics.fibonacci(input)
 
-      result.isDefined && (result.get == 0)
+      result.isDefined && (result.get == 1)
     })
   }
 
@@ -46,7 +46,7 @@ class FibonacciTest extends FunSuite with PropertyChecks with Checkers {
     check(Prop.forAll(oneGenerator) { input =>
       val result = Algorithmics.fibonacci(input)
 
-      result.isDefined && (result.get == 1)
+      result.isDefined && (result.get == 2)
     })
   }
 
