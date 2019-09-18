@@ -23,15 +23,15 @@ class PeselValidatorTest extends FunSuite with PropertyChecks with Checkers {
   val tenFactors = List(1, 3, 7, 9, 1, 3, 7, 9, 1, 3)
 
   val peselBaseGenerator: Gen[List[Int]] = for {
-      year <- yearGenerator
-      month <- monthGenerator
-      day <- dayGenerator
-      digit7 <- digitGenerator
-      digit8 <- digitGenerator
-      digit9 <- digitGenerator
-      digit10 <- digitGenerator
+    year <- yearGenerator
+    month <- monthGenerator
+    day <- dayGenerator
+    digit7 <- digitGenerator
+    digit8 <- digitGenerator
+    digit9 <- digitGenerator
+    digit10 <- digitGenerator
   } yield(List(year._1, year._2, month._1, month._2, day._1, day._2,
-      digit7, digit8, digit9, digit10))
+    digit7, digit8, digit9, digit10))
 
   val correctPeselGenerator: Gen[List[Int]] = peselBaseGenerator.map(peselBase =>
     peselBase ++ List((10 - digit(linearCombination(peselBase, tenFactors), 1)) % 10)
@@ -47,13 +47,13 @@ class PeselValidatorTest extends FunSuite with PropertyChecks with Checkers {
 
   test("Should accept correct PESEL") {
     check(Prop.forAllNoShrink(correctPeselGenerator) { input =>
-      PeselValidator.validate(input)
+      PeselValidator.validate(input.asLong)
     })
   }
 
   test("Should not accept incorrect PESEL") {
     check(Prop.forAllNoShrink(incorrectPeselGenerator) { input =>
-      !PeselValidator.validate(input)
+      !PeselValidator.validate(input.asLong)
     })
   }
 
