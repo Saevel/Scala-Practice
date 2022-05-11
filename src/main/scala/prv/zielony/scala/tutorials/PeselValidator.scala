@@ -11,7 +11,7 @@ object PeselValidator {
     * 1. The number has to have 11 digits
     * 2. The following algorithm should hold:
     *
-    *   We multiply multiply digits respectively:
+    * We multiply digits respectively:
     *   - first by 1
     *   - second by 3
     *   - third by 7
