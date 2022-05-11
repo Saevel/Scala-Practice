@@ -34,7 +34,7 @@ class FibonacciTest extends FunSuite with PropertyChecks with Checkers {
     })
   }
 
-  test("Equal to 1 for 0") {
+  test("Equal to 0 for 0") {
     check(Prop.forAll(zeroGenerator) { input =>
       val result = Algorithmics.fibonacci(input)
 
@@ -42,7 +42,7 @@ class FibonacciTest extends FunSuite with PropertyChecks with Checkers {
     })
   }
 
-  test("Equal to 2 for 1") {
+  test("Equal to 1 for 1") {
     check(Prop.forAll(oneGenerator) { input =>
       val result = Algorithmics.fibonacci(input)
 
